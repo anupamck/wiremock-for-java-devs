@@ -29,7 +29,7 @@ public class MoviesRestClient {
 
     public Movie retrieveMovieById(Integer movieId){
         try {
-            return webClient.get().uri(MoviesAppConstants.RETRIEVE_MOVIE_BY_ID, movieId)
+            return webClient.get().uri(MoviesAppConstants.MOVIE_BY_ID_PATH_PARAM_V1, movieId)
                 .retrieve()
                 .bodyToMono(Movie.class)
                 .block();
@@ -90,13 +90,57 @@ public class MoviesRestClient {
            }
     }
 
-    public Movie addMovie( Movie newMovie) {
-        return webClient.post().uri(MoviesAppConstants.ADD_MOVIE_V1)
-                .syncBody(newMovie)
-                .retrieve()
-                .bodyToMono(Movie.class)
-                .block();
+    public Movie addMovie(Movie newMovie) {
+        try {
+            return webClient.post().uri(MoviesAppConstants.ADD_MOVIE_V1)
+                    .syncBody(newMovie)
+                    .retrieve()
+                    .bodyToMono(Movie.class)
+                    .block();
+        } catch(WebClientResponseException e) {
+            log.error("WebClientResponseException in addMovie. " +
+                            "Status Code: {}; Message: {}",
+                    e.getRawStatusCode(), e.getResponseBodyAsString());
+            throw new MovieErrorResponse(e.getStatusText(), e);
+        } catch (Exception e) {
+            log.error("Exception in addMovie: {}", e);
+            throw new MovieErrorResponse(e);
+        }
     }
 
+    public Movie editMovie(Integer movieId, Movie editMovie) {
+        try {
+            return webClient.put().uri(MoviesAppConstants.MOVIE_BY_ID_PATH_PARAM_V1, movieId)
+                    .syncBody(editMovie)
+                    .retrieve()
+                    .bodyToMono(Movie.class)
+                    .block();
+        } catch(WebClientResponseException e) {
+            log.error("WebClientResponseException in editMovie. " +
+                            "Status Code: {}; Message: {}",
+                    e.getRawStatusCode(), e.getResponseBodyAsString());
+            throw new MovieErrorResponse(e.getStatusText(), e);
+        } catch (Exception e) {
+            log.error("Exception in editMovie: {}", e);
+            throw new MovieErrorResponse(e);
+        }
+    }
+
+    public String deleteMovie(Integer movieId) {
+        try {
+            return webClient.delete().uri(MoviesAppConstants.MOVIE_BY_ID_PATH_PARAM_V1, movieId)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch(WebClientResponseException e) {
+            log.error("WebClientResponseException in deleteMovie. " +
+                            "Status Code: {}; Message: {}",
+                    e.getRawStatusCode(), e.getResponseBodyAsString());
+            throw new MovieErrorResponse(e.getStatusText(), e);
+        } catch (Exception e) {
+            log.error("Exception in deleteMovie: {}", e);
+            throw new MovieErrorResponse(e);
+        }
+    }
 }
 
