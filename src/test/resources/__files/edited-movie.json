@@ -1,0 +1,7 @@
+{
+  "movie_id": "{{request.path.[3]}}",
+  "name": "The Best Exotic Marigold Hotel",
+  "year": 2012,
+  "cast": "Dev Patel, Maggie Smith, Judi Dench, {{jsonPath request.body '$.cast'}}",
+  "release_date": "2012-02-24"
+}

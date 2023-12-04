@@ -142,5 +142,29 @@ public class MoviesRestClient {
             throw new MovieErrorResponse(e);
         }
     }
+
+    public String deleteMovieByName(String movieName) {
+        String deleteMovieByNameUri = UriComponentsBuilder.fromUriString(MoviesAppConstants.MOVIES_BY_NAME_QUERY_PARAM_V1)
+                .queryParam("movie_name", movieName)
+                .buildAndExpand()
+                .toUriString();
+
+        try {
+            webClient.delete().uri(deleteMovieByNameUri)
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
+        } catch(WebClientResponseException e) {
+            log.error("WebClientResponseException in deleteMovie. " +
+                            "Status Code: {}; Message: {}",
+                    e.getRawStatusCode(), e.getResponseBodyAsString());
+            throw new MovieErrorResponse(e.getStatusText(), e);
+        } catch (Exception e) {
+            log.error("Exception in deleteMovie: {}", e);
+            throw new MovieErrorResponse(e);
+        }
+
+        return "Movie deleted successfully";
+    }
 }
 
